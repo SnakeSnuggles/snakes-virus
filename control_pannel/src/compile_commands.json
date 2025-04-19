@@ -1,0 +1,182 @@
+[
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo  -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /FoCMakeFiles\\glad.dir\\libs\\glad\\src\\glad.c.obj /FdCMakeFiles\\glad.dir\\glad.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\src\\glad.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glad/src/glad.c",
+  "output": "CMakeFiles/glad.dir/libs/glad/src/glad.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\src\\control.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\src\\control.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/src/control.cpp",
+  "output": "CMakeFiles/control_panel.dir/src/control.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\imgui.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\imgui.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/imgui.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/imgui.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\imgui_draw.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\imgui_draw.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/imgui_draw.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/imgui_draw.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\imgui_widgets.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\imgui_widgets.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/imgui_widgets.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/imgui_widgets.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\imgui_tables.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\imgui_tables.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/imgui_tables.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/imgui_tables.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\imgui_demo.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\imgui_demo.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/imgui_demo.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/imgui_demo.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\backends\\imgui_impl_glfw.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends\\imgui_impl_glfw.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/backends/imgui_impl_glfw.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/backends/imgui_impl_glfw.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -DIMGUI_IMPL_OPENGL_LOADER_GLAD -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glad\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MT /O2 /Ob2 /DNDEBUG -std:c++17 /FoCMakeFiles\\control_panel.dir\\libs\\imgui\\backends\\imgui_impl_opengl3.cpp.obj /FdCMakeFiles\\control_panel.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\imgui\\backends\\imgui_impl_opengl3.cpp",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/imgui/backends/imgui_impl_opengl3.cpp",
+  "output": "CMakeFiles/control_panel.dir/libs/imgui/backends/imgui_impl_opengl3.cpp.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\context.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\context.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/context.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/context.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\init.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\init.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/init.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/init.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\input.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\input.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/input.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/input.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\monitor.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\monitor.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/monitor.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/monitor.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\platform.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\platform.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/platform.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/platform.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\vulkan.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\vulkan.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/vulkan.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/vulkan.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\window.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\window.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/window.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/window.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\egl_context.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\egl_context.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/egl_context.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/egl_context.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\osmesa_context.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\osmesa_context.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/osmesa_context.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\null_init.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\null_init.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/null_init.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/null_init.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\null_monitor.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\null_monitor.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/null_monitor.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\null_window.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\null_window.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/null_window.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/null_window.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\null_joystick.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\null_joystick.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/null_joystick.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_module.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_module.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_module.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_module.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_time.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_time.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_time.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_time.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_thread.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_thread.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_thread.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_thread.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_init.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_init.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_init.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_init.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_joystick.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_joystick.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_joystick.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_joystick.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_monitor.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_monitor.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_monitor.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_monitor.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\win32_window.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\win32_window.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/win32_window.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/win32_window.c.obj"
+},
+{
+  "directory": "C:/Users/daves/Projects/omega_virus/control_pannel/build/libs/glfw/src",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_WIN32 -D_UNICODE -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\include -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src -IC:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\build\\libs\\glfw\\src /DWIN32 /D_WINDOWS /W3 /MT /O2 /Ob2 /DNDEBUG /W3 /FoCMakeFiles\\glfw.dir\\wgl_context.c.obj /FdCMakeFiles\\glfw.dir\\glfw.pdb /FS -c C:\\Users\\daves\\Projects\\omega_virus\\control_pannel\\libs\\glfw\\src\\wgl_context.c",
+  "file": "C:/Users/daves/Projects/omega_virus/control_pannel/libs/glfw/src/wgl_context.c",
+  "output": "libs/glfw/src/CMakeFiles/glfw.dir/wgl_context.c.obj"
+}
+]
