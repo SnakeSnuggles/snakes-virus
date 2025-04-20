@@ -1,3 +1,4 @@
+#include "ip.h"
 #include <iostream>
 #include <asio.hpp>
 #include <thread>
@@ -33,7 +34,7 @@ int main() {
             asio::io_context io_context;
 
             tcp::resolver resolver(io_context);
-            auto endpoints = resolver.resolve("70.77.121.59", "1234");
+            auto endpoints = resolver.resolve(ip, "1234");
 
             tcp::socket socket(io_context);
             asio::connect(socket, endpoints);

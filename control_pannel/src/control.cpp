@@ -1,3 +1,4 @@
+#include "ip.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -169,7 +170,7 @@ int main() {
     
     static ImVec4 background_color = ImVec4(0.102f, 0.102f, 0.102f, 1.0f);
 
-    Server server{"10.0.0.87", 1234};
+    Server server{ip, 1234};
     char text_buffer[256] = "";
 
 
@@ -211,9 +212,12 @@ int main() {
         //std::cout << "before popup\n";
             ImGui::Text("Popup");
             ImGui::SameLine();
-            ImGui::InputText("",text_buffer, sizeof(text_buffer));
+            ImGui::InputText("",text_buffer, sizeof(text_buffer), ImGuiInputTextFlags_EnterReturnsTrue);
             ImGui::SameLine();
-            if(ImGui::Button("Send")) {
+
+            bool enter_pressed = ImGui::IsItemDeactivatedAfterEdit() && ImGui::IsKeyPressed(ImGuiKey_Enter);
+
+            if(ImGui::Button("Send") || enter_pressed) {
                 if(server.is_client_connected(selected_client)) {
                     Packet packet{POPUP};
                     std::strcpy(packet.str, text_buffer);
@@ -264,24 +268,23 @@ int main() {
         */
             //std::cout << "before get connected clients start\n"; 
             std::vector<int> clients = server.get_connected_clients();
-            for(auto id : clients) {
-                //std::cout << "inside loop\n"; 
-                if(clients.size() == 0) {
-                    // std::cout << "Not enough clients\n"; 
-                    break;
+
+                for(auto id : clients) {
+                    std::string lable = "Client: " + std::to_string(id);
+
+                    if(selected_client == id) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
+                    }
+
+                    if(ImGui::Button(lable.c_str())) {
+                        std::cout << "selected client: " << id << "\n";
+                        selected_client = id;
+                    }
+
+                    if(selected_client == id) {
+                        ImGui::PopStyleColor(1); 
+                    }
                 }
-                std::string lable = "Client: " + std::to_string(id);
-                if(selected_client == id) {
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
-                }
-                if(ImGui::Button(lable.c_str())) {
-                    std::cout << "selected client: " << id << "\n";
-                    selected_client = id;
-                }
-                if(selected_client == id) {
-                    ImGui::PopStyleColor(1); 
-                }
-            }
             //std::cout << "end of loop\n"; 
         ImGui::End();
 
