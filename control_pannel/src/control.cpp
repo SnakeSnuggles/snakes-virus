@@ -45,19 +45,34 @@ public:
 
 class Server {
 private:
-    std::mutex client_mutex_;  
-    std::shared_mutex shared_client_mutex_;
+    std::shared_mutex client_mutex_;
     asio::io_context io_context_;
     tcp::acceptor acceptor_;
     int current_id_;
     std::map<int, std::unique_ptr<Client>> clients_;
 
+    bool is_client_connected_locked(int selected_client) {
+        return clients_.find(selected_client) != clients_.end();
+    }
 public:
     int selected_client = -1;
 
     Server(const std::string& address, unsigned short port)
         : acceptor_(io_context_, tcp::endpoint(asio::ip::make_address(address), port)),
           current_id_(0) {}
+
+    bool is_client_connected(int selected_client) {
+        std::unique_lock<std::shared_mutex> lock(client_mutex_);
+        auto connected = get_connected_clients();
+        bool result = false;
+        for(int id : connected) {
+            if(id == selected_client) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
     void handle_client_connect() {
         while(true) {
@@ -66,29 +81,34 @@ public:
             ec = acceptor_.accept(*socket, ec);
             if (ec) continue;
             
-            std::lock_guard<std::mutex> lock(client_mutex_);
+            std::unique_lock<std::shared_mutex> lock(client_mutex_);
             auto client = std::make_unique<Client>(std::move(*socket));
             clients_[current_id_++] = std::move(client);
         }
     }
 
-    void send_to_client(int id, Packet packet) {
-        std::lock_guard<std::mutex> lock(client_mutex_);
-        try {
-            if(id == -1) {
-                std::cout << "Please select a client";
-                return;
+    void send_to_client(Packet packet) {
+        std::unique_lock<std::shared_mutex> lock(client_mutex_);
+    
+        if (selected_client == -1) {
+            std::cout << "Please select a client\n";
+            return;
+        }
+    
+        auto cli = clients_.find(selected_client);
+        if (cli != clients_.end()) {
+            try {
+                cli->second->send(packet);
+            } catch (const std::exception& e) {
+                std::cerr << "Send failed: " << e.what() << "\n";
             }
-            if (clients_.count(id)) {
-                clients_[id]->send(packet);
-            }
-        } catch (const std::exception& e ) {
-            std::cout << "That client does not exist \n";
+        } else {
+            std::cout << "Client does not exist\n";
         }
     }
 
     void all_client_send(Packet packet) {
-        std::lock_guard<std::mutex> lock(client_mutex_);
+        std::unique_lock<std::shared_mutex> lock(client_mutex_);
         for(const auto& pair : clients_) {
             pair.second->send(packet);
         }
@@ -100,7 +120,7 @@ public:
             std::map<int, std::unique_ptr<Client>> still_alive;
     
             {
-                std::lock_guard<std::mutex> lock(client_mutex_);
+                std::unique_lock<std::shared_mutex> lock(client_mutex_);
                 for (auto& [id, client] : clients_) {
                     try {
                         Packet result = client->receive(packet_id::GET_DATA);
@@ -122,7 +142,7 @@ public:
     }
 
     std::vector<int> get_connected_clients() {
-        std::shared_lock<std::shared_mutex> lock(shared_client_mutex_);
+        std::shared_lock<std::shared_mutex> lock(client_mutex_);
         std::vector<int> cl;
         for(const auto& pair : clients_) {
             cl.push_back(pair.first);
@@ -130,14 +150,6 @@ public:
         return cl;
     }
 
-    bool is_client_connected(int selected_client) {
-        std::lock_guard<std::mutex> lock(client_mutex_);
-        auto connected = get_connected_clients();
-        if (std::find(connected.begin(), connected.end(), selected_client) == connected.end()) {
-            return false;
-        }
-        return true;
-    }
 };
 
 class Send_Field {
@@ -162,25 +174,20 @@ class Send_Field {
         ImGui::SameLine();
         std::string button_id = "Send##" + lable;
         if (ImGui::Button(button_id.c_str()) || enter_pressed) {
-            if (server.is_client_connected(selected_client)) {
-                Packet packet{packetId};
-                std::strcpy(packet.str, text_buffer);
-                server.send_to_client(selected_client, packet);
-                std::strcpy(text_buffer, "");
-            } else if (selected_client == -1) {
-                std::cout << "Please select a client";
-            } else {
-                std::cout << "Client no longer connected\n";
-            }
+            Packet packet{packetId};
+            std::strcpy(packet.str, text_buffer);
+            server.send_to_client(packet);
+            std::strcpy(text_buffer, "");
         }
     }
 };
 
 
+
 int main() {
 
     if (!glfwInit()) return -1;
-    GLFWwindow* w = glfwCreateWindow(640, 480, "control pannel", 0, 0);
+    GLFWwindow* w = glfwCreateWindow(900, 500, "control pannel", 0, 0);
     if (!w) return glfwTerminate(), -1;
     glfwMakeContextCurrent(w);
     IMGUI_CHECKVERSION();
@@ -198,24 +205,25 @@ int main() {
         server.handle_client_connect();
     });
     accept_thread.detach();
+
     std::thread alive_thread([&server]() {
         server.check_if_client_alive();
     });
     alive_thread.detach();
     
     Send_Field popup{"Popup", packet_id::POPUP, server};
-    Send_Field open_link{"Open link", packet_id::OPEN_LINK, server};
+    Send_Field open{"Open", packet_id::OPEN_LINK, server};
     Send_Field tts{"Send tts", packet_id::TTS, server};
 
+    int mouse_x = 0,mouse_y = 0;
+
     while (!glfwWindowShouldClose(w)) {
-   //     std::cout << "main loop start\n"; 
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
         ImGui::NewFrame();
         
-        // std::cout << "get connected clients start\n"; 
 
         ImGui::Begin("Send Data");
         /*
@@ -232,7 +240,7 @@ int main() {
         */
         //std::cout << "before popup\n";
             popup.draw();
-            open_link.draw();
+            open.draw();
             tts.draw();
         ImGui::End();
 
@@ -242,6 +250,15 @@ int main() {
             - inverted mouse (t)
             - lock mouse to a small box
         */
+            ImGui::InputInt("Mouse x", &mouse_x);
+            ImGui::InputInt("Mouse y", &mouse_y);
+            if(ImGui::Button("SendTheMousePos")) {
+                Packet packet{};
+                packet.id = packet_id::CURSER_POS;
+                packet.x = mouse_x;
+                packet.y = mouse_y;
+                server.send_to_client(packet);
+            }
 
         ImGui::End();
 
@@ -259,6 +276,7 @@ int main() {
             - set system volume
             - fake BSOD 
             - screen tint (send a color to recolor the screen)
+            - play a sound
         */
         ImGui::End();
 
@@ -266,7 +284,7 @@ int main() {
         ImGui::Begin("Manage");
         /*
             - Start/Stop all button
-            - A target selector
+            d A target selector
             - A auto mode which does pranks automatically
             - A log of pranks ran
             - Add a prank schedual
