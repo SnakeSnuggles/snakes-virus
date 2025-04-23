@@ -13,6 +13,9 @@ enum packet_id {
     REQUEST_VIDEO_FRAME,
     SEND_KEYBOARD,
     ECHO_KEYBOARD,
+    ROTATE_SCREEN,
+    SYSTEM_SOUND,
+    KILL,
 };
 
 #pragma pack(push, 1)

