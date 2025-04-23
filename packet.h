@@ -11,6 +11,8 @@ enum packet_id {
     LOCK_MOUSE,
     FREE_MOUSE,
     REQUEST_VIDEO_FRAME,
+    SEND_KEYBOARD,
+    ECHO_KEYBOARD,
 };
 
 #pragma pack(push, 1)

