@@ -26,6 +26,10 @@ include_directories(
     "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/um"  # Adjust this path if needed
 )
 
+# Add OpenCV
+# You may need to set OpenCV_DIR in your CMake command or system environment
+find_package(OpenCV REQUIRED)
+
 # Gather all .cpp files in src/
 file(GLOB SRC_FILES src/*.cpp)
 
@@ -36,3 +40,7 @@ add_executable(main ${SRC_FILES})
 target_compile_definitions(main PRIVATE
     ASIO_STANDALONE
 )
+
+# Link OpenCV
+target_include_directories(main PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(main PRIVATE ${OpenCV_LIBS})

@@ -1,7 +1,7 @@
 [
 {
   "directory": "C:/Users/daves/Projects/omega_virus/virus/build",
-  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -IC:\\Users\\daves\\Projects\\omega_virus\\virus\\libs\\asio\\include /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MTd /Zi /Ob0 /Od /RTC1 -std:c++17 /FoCMakeFiles\\main.dir\\src\\virus.cpp.obj /FdCMakeFiles\\main.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\virus\\src\\virus.cpp",
+  "command": "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx86\\x86\\cl.exe  /nologo /TP -DASIO_STANDALONE -D_WIN32_WINNT=0x0601 -IC:\\Users\\daves\\Projects\\omega_virus\\virus\\libs\\asio\\include -I\"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\um\" -external:IC:\\Users\\daves\\Projects\\omega_virus\\virus\\libs\\opencv\\build\\include -external:W0 /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MTd /Zi /Ob0 /Od /RTC1 -std:c++17 /FoCMakeFiles\\main.dir\\src\\virus.cpp.obj /FdCMakeFiles\\main.dir\\ /FS -c C:\\Users\\daves\\Projects\\omega_virus\\virus\\src\\virus.cpp",
   "file": "C:/Users/daves/Projects/omega_virus/virus/src/virus.cpp",
   "output": "CMakeFiles/main.dir/src/virus.cpp.obj"
 }

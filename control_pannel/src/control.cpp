@@ -8,23 +8,20 @@
 #include <iostream>
 #include <asio.hpp>
 #include <mutex>
-#include <shared_mutex>
 #include <thread>
 #include <map>
 #include <memory>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 using asio::ip::tcp;
 
-
 class Client {
-private:
-    tcp::socket socket_;
-
 public:
+    tcp::socket socket_;
     Client(tcp::socket socket)
         : socket_(std::move(socket)) {}
 
-    void send(Packet packet) {
+    void send(Packet& packet) {
         asio::write(socket_, asio::buffer(&packet, sizeof(packet)));
     }
 
@@ -45,14 +42,22 @@ public:
 
 class Server {
 private:
-    std::shared_mutex client_mutex_;
+    std::mutex client_mutex_;
     asio::io_context io_context_;
     tcp::acceptor acceptor_;
     int current_id_;
     std::map<int, std::unique_ptr<Client>> clients_;
 
-    bool is_client_connected_locked(int selected_client) {
+    bool is_client_connected_unlocked(int selected_client) {
         return clients_.find(selected_client) != clients_.end();
+    }
+    Client* get_selected_client_unlocked() {
+        for (const auto& [id, client] : clients_) {
+            if (id == selected_client) {
+                return client.get();
+            }
+        }
+        return nullptr;
     }
 public:
     int selected_client = -1;
@@ -62,7 +67,7 @@ public:
           current_id_(0) {}
 
     bool is_client_connected(int selected_client) {
-        std::unique_lock<std::shared_mutex> lock(client_mutex_);
+        std::unique_lock<std::mutex> lock(client_mutex_);
         auto connected = get_connected_clients();
         bool result = false;
         for(int id : connected) {
@@ -74,6 +79,16 @@ public:
         return result;
     }
 
+    Client* get_selected_client() {
+        std::unique_lock<std::mutex> lock(client_mutex_);
+        for(const auto& [id, client] : clients_) {
+            if(id == selected_client) {
+                return client.get();
+            }
+        }
+        return nullptr;
+    }
+
     void handle_client_connect() {
         while(true) {
             auto socket = std::make_unique<tcp::socket>(io_context_);
@@ -81,34 +96,40 @@ public:
             ec = acceptor_.accept(*socket, ec);
             if (ec) continue;
             
-            std::unique_lock<std::shared_mutex> lock(client_mutex_);
+            std::unique_lock<std::mutex> lock(client_mutex_);
             auto client = std::make_unique<Client>(std::move(*socket));
             clients_[current_id_++] = std::move(client);
         }
     }
 
-    void send_to_client(Packet packet) {
-        std::unique_lock<std::shared_mutex> lock(client_mutex_);
+    void send_to_client(Packet& packet) {
+        std::cout << "does this even run?\n";
+        std::unique_lock<std::mutex> lock(client_mutex_);
     
         if (selected_client == -1) {
             std::cout << "Please select a client\n";
             return;
         }
-    
-        auto cli = clients_.find(selected_client);
-        if (cli != clients_.end()) {
-            try {
-                cli->second->send(packet);
-            } catch (const std::exception& e) {
-                std::cerr << "Send failed: " << e.what() << "\n";
-            }
-        } else {
-            std::cout << "Client does not exist\n";
+        
+        std::cout << "or is it here that it ends?\n";
+        Client* cli = get_selected_client_unlocked();
+        if(cli == nullptr) {
+            std::cout << "is this where it ends?\n";
+            return;
+        }
+        std::cout << "maybe it crashes after this?\n";
+        try {
+            std::cout << "is this where it crashes??\n";
+            cli->send(packet);
+            std::cout << "or is it here?\n";
+            std::cout << "after trying to send packet to client\n"; 
+        } catch (const std::exception& e) {
+            std::cerr << "Send failed: " << e.what() << "\n";
         }
     }
 
     void all_client_send(Packet packet) {
-        std::unique_lock<std::shared_mutex> lock(client_mutex_);
+        std::unique_lock<std::mutex> lock(client_mutex_);
         for(const auto& pair : clients_) {
             pair.second->send(packet);
         }
@@ -116,11 +137,11 @@ public:
 
 
     void check_if_client_alive() {
-        while (true) {
+        //while (true) {
             std::map<int, std::unique_ptr<Client>> still_alive;
     
             {
-                std::unique_lock<std::shared_mutex> lock(client_mutex_);
+                std::unique_lock<std::mutex> lock(client_mutex_);
                 for (auto& [id, client] : clients_) {
                     try {
                         Packet result = client->receive(packet_id::GET_DATA);
@@ -137,12 +158,15 @@ public:
                 clients_ = std::move(still_alive);
             }
     
+            if (clients_.find(selected_client) == clients_.end()) {
+                selected_client = -1;
+            }
             std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        // }
     }
 
     std::vector<int> get_connected_clients() {
-        std::shared_lock<std::shared_mutex> lock(client_mutex_);
+        std::unique_lock<std::mutex> lock(client_mutex_);
         std::vector<int> cl;
         for(const auto& pair : clients_) {
             cl.push_back(pair.first);
@@ -150,6 +174,35 @@ public:
         return cl;
     }
 
+    std::vector<unsigned char> get_video_frame(int &width, int &height) {
+        Client* cli = get_selected_client();
+        if(cli == nullptr)
+            return {};
+
+        Packet thing{};
+        thing.id = packet_id::REQUEST_VIDEO_FRAME;
+        
+        std::cout << "before packet to client\n";
+        send_to_client(thing);
+        std::cout << "sent packet to client\n";
+
+        int width_net, height_net, size_net;
+        std::cout << "attempting to get size, height, and width\n";
+        asio::read(cli->socket_, asio::buffer(&width_net, sizeof(width_net)));
+        asio::read(cli->socket_, asio::buffer(&height_net, sizeof(height_net)));
+        asio::read(cli->socket_, asio::buffer(&size_net, sizeof(size_net)));
+
+        width = ntohl(width_net);
+        height = ntohl(height_net);
+        size_t size = ntohl(size_net);
+
+        std::cout << "Width: " << width << "\n";
+        std::cout << "Height: " << height<< "\n";
+        std::cout << "Size: " << size << "\n";
+        std::vector<unsigned char> buffer(size);
+        asio::read(cli->socket_, asio::buffer(buffer.data(), size));
+        return buffer;
+    }
 };
 
 class Send_Field {
@@ -182,18 +235,58 @@ class Send_Field {
     }
 };
 
+class Toggle_Field {
+    private:
+        bool state = false;
+        Server& server;
+        std::string lable;
+        packet_id packetid;
+    public:
+        Toggle_Field(std::string lable_, packet_id pac_id, Server &server_) : lable(lable_), packetid(pac_id), server(server_){}
+        void draw() {
+            ImGui::Text(lable.c_str());
+            ImGui::SameLine();
+            std::string button_lable = state ? ("on##" + lable) : ("off##" + lable);
+            if(ImGui::Button(button_lable.c_str())) {
+                state = !state;
+                Packet packet{};
+                packet.id = packetid;
+                packet.bo = state;
+                server.send_to_client(packet);
+            }
+        }
+};
+
+GLuint create_texture() {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    return textureID;
+}
+void modify_texture(const GLuint& textureID, unsigned char* data, int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Set texture filtering & wrapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Upload pixels
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 
 int main() {
 
     if (!glfwInit()) return -1;
-    GLFWwindow* w = glfwCreateWindow(900, 500, "control pannel", 0, 0);
-    if (!w) return glfwTerminate(), -1;
-    glfwMakeContextCurrent(w);
+    GLFWwindow* window = glfwCreateWindow(900, 500, "control pannel", 0, 0);
+    if (!window) return glfwTerminate(), -1;
+    glfwMakeContextCurrent(window);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(w, true);
-    ImGui_ImplOpenGL3_Init();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
     ImGui::StyleColorsDark();
     
     static ImVec4 background_color = ImVec4(0.102f, 0.102f, 0.102f, 1.0f);
@@ -206,24 +299,42 @@ int main() {
     });
     accept_thread.detach();
 
-    std::thread alive_thread([&server]() {
-        server.check_if_client_alive();
-    });
-    alive_thread.detach();
-    
+    // std::thread alive_thread([&server]() {
+    //     server.check_if_client_alive();
+    // });
+    // alive_thread.detach();
+
     Send_Field popup{"Popup", packet_id::POPUP, server};
     Send_Field open{"Open", packet_id::OPEN_LINK, server};
     Send_Field tts{"Send tts", packet_id::TTS, server};
 
+    Toggle_Field move_mouse{"Random move mouse",packet_id::RANDOM_MOUSE_MOVE,server};
+    Toggle_Field invert_mouse{"Invert mouse", packet_id::INVERT_MOUSE,server};
     int mouse_x = 0,mouse_y = 0;
-
-    while (!glfwWindowShouldClose(w)) {
+    int size_x = 100,size_y = 100;
+    
+    GLuint texture_id = create_texture();
+    int delay = 0;
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
-
-        ImGui::NewFrame();
         
+        delay++;
+        if(delay == 500) {
+            server.check_if_client_alive();
+            delay = 0;
+        }
+        
+        ImGui::NewFrame();
+             ImGui::Begin("Video");
+                int height, width;
+                std::vector<unsigned char> png = server.get_video_frame(width,height);
+                modify_texture(texture_id, png.data(), width, height);
+                ImVec2 video_space = ImGui::GetContentRegionAvail();
+                //ImGui::Image((ImTextureID)(intptr_t)texture_id, ImVec2((float)width, (float)height));
+                ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
+             ImGui::End();
 
         ImGui::Begin("Send Data");
         /*
@@ -246,10 +357,11 @@ int main() {
 
         ImGui::Begin("Mouse");
         /*
-            - make mouse move randomly (t)
-            - inverted mouse (t)
-            - lock mouse to a small box
+            d make mouse move randomly (t)
+            d inverted mouse (t)
+            d lock mouse to a small box
         */
+        if(ImGui::CollapsingHeader("Mouse Position")) {
             ImGui::InputInt("Mouse x", &mouse_x);
             ImGui::InputInt("Mouse y", &mouse_y);
             if(ImGui::Button("SendTheMousePos")) {
@@ -259,6 +371,38 @@ int main() {
                 packet.y = mouse_y;
                 server.send_to_client(packet);
             }
+        }
+
+        if(ImGui::CollapsingHeader("Mouse Control")) {
+            move_mouse.draw();
+            invert_mouse.draw();
+        }
+        if(ImGui::CollapsingHeader("Box Controls")) {
+            ImGui::InputInt("Box X", &mouse_x);
+            ImGui::InputInt("Box Y", &mouse_y);
+            ImGui::InputInt("Box Size X", &size_x);
+            ImGui::InputInt("Box Size Y", &size_y);
+
+            if(ImGui::Button("Send Box magic")) {
+                Packet packet{};
+                packet.id = packet_id::LOCK_MOUSE;
+                packet.x = mouse_x;
+                packet.y = mouse_y;
+
+                packet.size_x = size_x;
+                packet.size_y = size_y;
+
+                server.send_to_client(packet);
+            }
+            if(ImGui::Button("Release curser")) {
+                Packet packet{};
+                packet.id = packet_id::FREE_MOUSE;
+
+                server.send_to_client(packet);
+            }  
+        }
+
+            
 
         ImGui::End();
 
@@ -291,22 +435,22 @@ int main() {
         */
             std::vector<int> clients = server.get_connected_clients();
 
-                for(auto id : clients) {
-                    std::string lable = "Client: " + std::to_string(id);
-
-                    if(server.selected_client == id) {
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
-                    }
-
-                    if(ImGui::Button(lable.c_str())) {
-                        std::cout << "selected client: " << id << "\n";
-                        server.selected_client = id;
-                    }
-
-                    if(server.selected_client == id) {
-                        ImGui::PopStyleColor(1); 
-                    }
+            for (auto id : clients) {
+                std::string label = "Client: " + std::to_string(id);
+                bool is_selected = (server.selected_client == id);
+            
+                if (is_selected)
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.9f, 1.0f));
+            
+                if (ImGui::Button(label.c_str())) {
+                    std::cout << "Selected client: " << id << "\n";
+                    server.selected_client = id;
                 }
+            
+                if (is_selected)
+                    ImGui::PopStyleColor();  // only pop if push happened
+            }
+            ImGui::NewLine();  // wrap after all client buttons
         ImGui::End();
 
         ImGui::Begin("customize");
@@ -314,18 +458,17 @@ int main() {
         ImGui::End();
 
         ImGui::Render();
-        int w_, h_; glfwGetFramebufferSize(w, &w_, &h_);
+        int w_, h_; glfwGetFramebufferSize(window, &w_, &h_);
         glViewport(0, 0, w_, h_);
         glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(w);
+        glfwSwapBuffers(window);
     }
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    glfwDestroyWindow(w);
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

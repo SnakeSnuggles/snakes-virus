@@ -1,4 +1,4 @@
 **/.cache
 **/build
-**/!build
+**/!build.bat
 **/ip.h

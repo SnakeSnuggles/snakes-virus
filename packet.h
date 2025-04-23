@@ -1,12 +1,16 @@
 #pragma once
 
 enum packet_id {
-    GET_DATA = 0,
-    POPUP = 1,
-    OPEN_LINK = 2,
-    TTS = 3,
-    CURSER_POS = 4,
-    COUNT,
+    GET_DATA,
+    POPUP,
+    OPEN_LINK,
+    TTS,
+    CURSER_POS,
+    RANDOM_MOUSE_MOVE,
+    INVERT_MOUSE,
+    LOCK_MOUSE,
+    FREE_MOUSE,
+    REQUEST_VIDEO_FRAME,
 };
 
 #pragma pack(push, 1)
@@ -14,7 +18,8 @@ struct Packet {
     packet_id id;
     union {
         int number;
-        int x, y;
+        bool bo;
+        int x, y, size_x, size_y;
         packet_id packetid;
         double double_number;
         char str[256];
