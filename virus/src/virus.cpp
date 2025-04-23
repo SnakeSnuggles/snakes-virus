@@ -195,12 +195,67 @@ class free_mouse : public Packet_Manager {
         free_locked_mouse();
     }
 };
+bool captureScreenRGBA(unsigned char*& outPixels,
+                       int& width,
+                       int& height,
+                       int& channels /* =4 */)
+{
+    HDC hScreenDC = GetDC(nullptr);                // whole desktop
+    HDC hMemDC    = CreateCompatibleDC(hScreenDC);
+
+    width  = GetSystemMetrics(SM_CXSCREEN);
+    height = GetSystemMetrics(SM_CYSCREEN);
+    channels = 4;                                  // we force RGBA8
+
+    // Create a 32‑bit DIB section we can directly copy out of.
+    BITMAPINFO bmi { };
+    bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth       = width;
+    bmi.bmiHeader.biHeight      = -height;         // negative = top‑down
+    bmi.bmiHeader.biPlanes      = 1;
+    bmi.bmiHeader.biBitCount    = 32;              // BGRA, 8 bits each
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    void* dibPixels = nullptr;
+    HBITMAP hDib    = CreateDIBSection(
+        hScreenDC, &bmi, DIB_RGB_COLORS, &dibPixels, nullptr, 0);
+
+    HGDIOBJ oldBmp = SelectObject(hMemDC, hDib);
+
+    // Copy the screen into our DIB.
+    BitBlt(hMemDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
+
+    // Allocate final buffer in the same format stb delivers (RGBA).
+    size_t byteCount = static_cast<size_t>(width) * height * channels;
+    outPixels = static_cast<unsigned char*>(malloc(byteCount));
+
+    // Convert BGRA → RGBA in‑place while copying.
+    uint8_t* src = static_cast<uint8_t*>(dibPixels);
+    uint8_t* dst = outPixels;
+    for (size_t i = 0; i < width * height; ++i)
+    {
+        dst[0] = src[2];   // R
+        dst[1] = src[1];   // G
+        dst[2] = src[0];   // B
+        dst[3] = src[3];   // A (always 255 from desktop)
+        src += 4; dst += 4;
+    }
+
+    // Cleanup
+    SelectObject(hMemDC, oldBmp);
+    DeleteObject(hDib);
+    DeleteDC(hMemDC);
+    ReleaseDC(nullptr, hScreenDC);
+
+    return true;
+}
 
 class get_video_frame : public Packet_Manager {
     void send(tcp::socket &socket, Packet &packet) override {
         try {
             int width, height, channels;
-            unsigned char* data = stbi_load("image.png", &width, &height, &channels, 4);
+            unsigned char* data;
+            captureScreenRGBA(data, width, height, channels);
             size_t size = width * height * 4; // RGBA = 4 channels
         
             int image_size = width * height * 4;
@@ -208,13 +263,17 @@ class get_video_frame : public Packet_Manager {
             int width_net = htonl(width);
             int height_net = htonl(height);
             size_t size_net = htonl(size);
-            
-            asio::write(socket, asio::buffer(&width_net, sizeof(width_net)));
-            asio::write(socket, asio::buffer(&height_net, sizeof(height_net)));
-            asio::write(socket, asio::buffer(&size_net, sizeof(size_net)));
-            
-            asio::write(socket, asio::buffer(data, image_size));
-
+            try {
+                asio::write(socket, asio::buffer(&width_net, sizeof(width_net)));
+                asio::write(socket, asio::buffer(&height_net, sizeof(height_net)));
+                asio::write(socket, asio::buffer(&size_net, sizeof(size_net)));
+                
+                asio::write(socket, asio::buffer(data, image_size));
+            } catch(const std::exception e) {
+                std::cout << e.what() << "\n";
+                std::cout << "failed to send frame\n";
+                return;
+            }
         } catch (const std::exception& e) {
             std::cerr << "Exception in get_video_frame::send: " << e.what() << '\n';
         }
@@ -393,7 +452,7 @@ int main() {
                 if (len == sizeof(Packet)) {
                     for(auto [id, handler] : Packet_Manager::Every_Package) {
                         if(packet.id == (packet_id)id) {
-                            std::cout << "processing packet\n";
+                            //std::cout << "processing packet\n";
                             handler->receive(packet);
                             handler->send(socket, packet);
                         }

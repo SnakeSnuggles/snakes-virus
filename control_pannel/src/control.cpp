@@ -201,10 +201,14 @@ public:
 
         int width_net, height_net, size_net;
         std::cout << "attempting to get size, height, and width\n";
-        asio::read(cli->socket_, asio::buffer(&width_net, sizeof(width_net)));
-        asio::read(cli->socket_, asio::buffer(&height_net, sizeof(height_net)));
-        asio::read(cli->socket_, asio::buffer(&size_net, sizeof(size_net)));
-
+        try {
+            asio::read(cli->socket_, asio::buffer(&width_net, sizeof(width_net)));
+            asio::read(cli->socket_, asio::buffer(&height_net, sizeof(height_net)));
+            asio::read(cli->socket_, asio::buffer(&size_net, sizeof(size_net)));
+        } catch(const std::exception e) {
+            std::cout << "failed to get video frame \n";
+            return {};
+        }
         width = ntohl(width_net);
         height = ntohl(height_net);
         size_t size = ntohl(size_net);
@@ -312,10 +316,10 @@ int main() {
     });
     accept_thread.detach();
 
-    std::thread alive_thread([&server]() {
-        server.check_if_client_alive();
-    });
-    alive_thread.detach();
+    // std::thread alive_thread([&server]() {
+    //     server.check_if_client_alive();
+    // });
+    // alive_thread.detach();
 
     Send_Field popup{"Popup", packet_id::POPUP, server};
     Send_Field open{"Open", packet_id::OPEN_LINK, server};
@@ -338,13 +342,13 @@ int main() {
         
         
         ImGui::NewFrame();
-             // ImGui::Begin("Video");
-             //    int height, width;
-             //    std::vector<unsigned char> png = server.get_video_frame(width,height);
-             //    modify_texture(texture_id, png.data(), width, height);
-             //    ImVec2 video_space = ImGui::GetContentRegionAvail();
-             //    ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
-             // ImGui::End();
+             ImGui::Begin("Video");
+                int height, width;
+                std::vector<unsigned char> png = server.get_video_frame(width,height);
+                modify_texture(texture_id, png.data(), width, height);
+                ImVec2 video_space = ImGui::GetContentRegionAvail();
+                ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
+             ImGui::End();
 
         ImGui::Begin("Send Data");
         /*
