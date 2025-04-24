@@ -269,20 +269,16 @@ GLuint create_texture() {
     glGenTextures(1, &textureID);
     return textureID;
 }
-void modify_texture(const GLuint& textureID, unsigned char* data, int width, int height) {
-    glBindTexture(GL_TEXTURE_2D, textureID);
+void modify_texture(const GLuint& textureID, unsigned char* data, int width, int height) { glBindTexture(GL_TEXTURE_2D, textureID);
 
-    // Set texture filtering & wrapping
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Upload pixels
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
-
 
 int main() {
 
@@ -317,8 +313,15 @@ int main() {
     std::atomic<bool> new_png(false);
     int png_width;
     int png_height;
+    
+    bool video_on = false;
+
     std::thread fetch_thread([&]() {
         while (true) {
+            if(!video_on) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(333));
+                continue;
+            }
             int w, h;
             auto data = server.get_video_frame(w, h);
             if (!data.empty()) {
@@ -331,7 +334,7 @@ int main() {
             std::this_thread::sleep_for(std::chrono::milliseconds(333));
         }
     });
-fetch_thread.detach();
+    fetch_thread.detach();
 
     Send_Field popup{"Popup", packet_id::POPUP, server};
     Send_Field open{"Open", packet_id::OPEN_LINK, server};
@@ -356,21 +359,26 @@ fetch_thread.detach();
 
         ImGui::Begin("Video");
            ImVec2 video_space = ImGui::GetContentRegionAvail();
-           ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
-            if (new_png.exchange(false, std::memory_order_acquire)) {
-                std::vector<unsigned char> local;
-                int w, h;
-                {
-                    std::lock_guard<std::mutex> lg(png_mutex);
-                    local.swap(png_buffer);
-                    w = png_width;
-                    h = png_height;
-                }
-                if (!local.empty()) {
-                    modify_texture(texture_id, local.data(), w, h); // OpenGL-safe
-                }
-            }
-            ImGui::Image((ImTextureID)texture_id, video_space);
+           std::string video_on_lable = "Video:" + std::string(video_on ? "on" : "off");
+           if(ImGui::Button(video_on_lable.c_str())) {
+               video_on = !video_on;
+           }
+           if(video_on) {
+               if (new_png.exchange(false, std::memory_order_acquire)) {
+                   std::vector<unsigned char> local;
+                   int w, h;
+                   {
+                       std::lock_guard<std::mutex> lg(png_mutex);
+                       local.swap(png_buffer);
+                       w = png_width;
+                       h = png_height;
+                   }
+                   if (!local.empty()) {
+                       modify_texture(texture_id, local.data(), w, h); 
+                   }
+               }
+           }
+           ImGui::Image((ImTextureID)texture_id, video_space);
         ImGui::End();
 
         ImGui::Begin("Send Data");
