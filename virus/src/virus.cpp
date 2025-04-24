@@ -295,8 +295,7 @@ class get_video_frame : public Packet_Manager {
 //     std::thread worker;
 //     HHOOK hHook = nullptr;
 // 
-//     echo_keyboard()
-//     {
+//     echo_keyboard() {
 //         worker = std::thread([this]{ loop(); });
 //         worker.detach();
 //     }

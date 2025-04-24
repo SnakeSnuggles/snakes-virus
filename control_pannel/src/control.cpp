@@ -48,6 +48,8 @@ private:
     int current_id_;
     std::map<int, std::unique_ptr<Client>> clients_;
 
+    std::atomic<bool> is_thingy_locked{false}; 
+
     bool is_client_connected_unlocked(int selected_client) {
         return clients_.find(selected_client) != clients_.end();
     }
@@ -116,7 +118,6 @@ public:
     }
 
     void send_to_client(Packet& packet) {
-        std::cout << "does this even run?\n";
         std::unique_lock<std::mutex> lock(client_mutex_);
     
         if (selected_client == -1) {
@@ -124,18 +125,12 @@ public:
             return;
         }
         
-        std::cout << "or is it here that it ends?\n";
         Client* cli = get_selected_client_unlocked();
         if(cli == nullptr) {
-            std::cout << "is this where it ends?\n";
             return;
         }
-        std::cout << "maybe it crashes after this?\n";
         try {
-            std::cout << "is this where it crashes??\n";
             cli->send(packet);
-            std::cout << "or is it here?\n";
-            std::cout << "after trying to send packet to client\n"; 
         } catch (const std::exception& e) {
             std::cerr << "Send failed: " << e.what() << "\n";
         }
@@ -188,19 +183,17 @@ public:
     }
 
     std::vector<unsigned char> get_video_frame(int &width, int &height) {
-        Client* cli = get_selected_client();
+        Client* cli = get_selected_client_unlocked();
         if(cli == nullptr)
             return {};
 
         Packet thing{};
         thing.id = packet_id::REQUEST_VIDEO_FRAME;
         
-        std::cout << "before packet to client\n";
         send_to_client(thing);
-        std::cout << "sent packet to client\n";
 
+        std::unique_lock<std::mutex> lock(client_mutex_);
         int width_net, height_net, size_net;
-        std::cout << "attempting to get size, height, and width\n";
         try {
             asio::read(cli->socket_, asio::buffer(&width_net, sizeof(width_net)));
             asio::read(cli->socket_, asio::buffer(&height_net, sizeof(height_net)));
@@ -213,9 +206,6 @@ public:
         height = ntohl(height_net);
         size_t size = ntohl(size_net);
 
-        std::cout << "Width: " << width << "\n";
-        std::cout << "Height: " << height<< "\n";
-        std::cout << "Size: " << size << "\n";
         std::vector<unsigned char> buffer(size);
         asio::read(cli->socket_, asio::buffer(buffer.data(), size));
         return buffer;
@@ -316,10 +306,32 @@ int main() {
     });
     accept_thread.detach();
 
-    // std::thread alive_thread([&server]() {
-    //     server.check_if_client_alive();
-    // });
-    // alive_thread.detach();
+    std::thread alive_thread([&server]() {
+        server.check_if_client_alive();
+    });
+    alive_thread.detach();
+
+    GLuint texture_id = create_texture();
+    std::mutex png_mutex;
+    std::vector<unsigned char> png_buffer;
+    std::atomic<bool> new_png(false);
+    int png_width;
+    int png_height;
+    std::thread fetch_thread([&]() {
+        while (true) {
+            int w, h;
+            auto data = server.get_video_frame(w, h);
+            if (!data.empty()) {
+                std::lock_guard<std::mutex> lg(png_mutex);
+                png_buffer.swap(data); // move
+                png_width  = w;
+                png_height = h;
+                new_png = true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(333));
+        }
+    });
+fetch_thread.detach();
 
     Send_Field popup{"Popup", packet_id::POPUP, server};
     Send_Field open{"Open", packet_id::OPEN_LINK, server};
@@ -334,7 +346,6 @@ int main() {
     int size_x = 100,size_y = 100;
     
     int selected_button = 0;
-    GLuint texture_id = create_texture();
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
@@ -342,13 +353,25 @@ int main() {
         
         
         ImGui::NewFrame();
-             ImGui::Begin("Video");
-                int height, width;
-                std::vector<unsigned char> png = server.get_video_frame(width,height);
-                modify_texture(texture_id, png.data(), width, height);
-                ImVec2 video_space = ImGui::GetContentRegionAvail();
-                ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
-             ImGui::End();
+
+        ImGui::Begin("Video");
+           ImVec2 video_space = ImGui::GetContentRegionAvail();
+           ImGui::Image((ImTextureID)(intptr_t)texture_id, video_space);
+            if (new_png.exchange(false, std::memory_order_acquire)) {
+                std::vector<unsigned char> local;
+                int w, h;
+                {
+                    std::lock_guard<std::mutex> lg(png_mutex);
+                    local.swap(png_buffer);
+                    w = png_width;
+                    h = png_height;
+                }
+                if (!local.empty()) {
+                    modify_texture(texture_id, local.data(), w, h); // OpenGL-safe
+                }
+            }
+            ImGui::Image((ImTextureID)texture_id, video_space);
+        ImGui::End();
 
         ImGui::Begin("Send Data");
         /*
