@@ -1,6 +1,7 @@
 # !!WARNING!!
 **THIS IS A VIRUS THIS CAN DO HARM DO NOT RUN ON A MACHINE YOU CARE ABOUT**
 #### Only use for education purposes please don't use my dumb virus to do harm lol
+#### The control pannel should work for any os because I did not use any windows api but the virus itself will only work on windows
 ## To compile
 - Create a file in the root directory called ```ip.h``` and put code like this
 ```c++
