@@ -11,7 +11,7 @@ static const unsigned short port = 1234; // the port you wish the program to con
 static const std::string machine_ip = "10.0.0.86"; // The control pannel's host machine private ip
 static const std::string connect_to_ip = "10.0.0.86"; // the host machine's ip 
 ```
-- Use cmake to compile (I am not very good at c++ you can surly figure it out right?)
+- Use cmake to compile both the control pannel and the virus(I am not very good at c++ you can surly figure it out, right?)
 ## Usage
 
 - Run ```control_pannel.exe```
@@ -22,4 +22,4 @@ static const std::string connect_to_ip = "10.0.0.86"; // the host machine's ip
 
 ## License
 
-[MIT](LICENCE)
+[MIT](/LICENCE)
