@@ -18,7 +18,17 @@ static const std::string connect_to_ip = "10.0.0.86"; // the host machine's ip
 - Run ```main.exe```
 
 ## Features
-- a
+- select a connected virus
+- open a pop up
+- open a link (this includes opening other programs on the user's computer)
+- send a tts message
+- set the cursers's position
+- move the mouse randomly
+- invert the mouse movement
+- lock the mouse to a box
+- unlock the mouse from the box
+- a video feed of the selected virus (I did not mean to make spywear but yea, uhh mb ig)
+- ablility to kill the currently selected virus
 
 ## License
 
