@@ -1,4 +1,4 @@
-# !!WARNING!!
+# !!WARNING!!⚠️
 **THIS IS A VIRUS THIS CAN DO HARM DO NOT RUN ON A MACHINE YOU CARE ABOUT**
 #### Only use for education purposes please don't use my dumb virus to do harm lol
 #### The control pannel should work for any os because I did not use any windows api but the virus itself will only work on windows
@@ -33,4 +33,4 @@ static const std::string connect_to_ip = "10.0.0.86"; // the host machine's ip
 
 ## License
 
-[MIT](/LICENCE)
+MIT - but I really would not like anyone to use this in a bad way please.
