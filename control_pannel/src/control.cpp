@@ -1,4 +1,4 @@
-#include "ip.h"
+#include "../../ip.h"
 #include "../../packet.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
@@ -294,7 +294,7 @@ int main() {
     
     static ImVec4 background_color = ImVec4(0.102f, 0.102f, 0.102f, 1.0f);
 
-    Server server{ip, 1234};
+    Server server{machine_ip, port};
 
 
     std::thread accept_thread([&server]() {

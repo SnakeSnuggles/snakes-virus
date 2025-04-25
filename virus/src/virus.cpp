@@ -2,7 +2,6 @@
 #include <string>
 #include <thread>
 #include <map>
-#include "ip.h"
 #include <iostream>
 #define _WIN32_WINNT 0x0601
 #include <windows.h>
@@ -15,6 +14,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "../../packet.h"
+#include "../../ip.h"
 // #include "stupid_windows.h"
 using asio::ip::tcp;
 
@@ -438,7 +438,7 @@ int main() {
             asio::io_context io_context;
 
             tcp::resolver resolver(io_context);
-            auto endpoints = resolver.resolve(ip, "1234");
+            auto endpoints = resolver.resolve(connect_to_ip, std::to_string(port));
 
             tcp::socket socket(io_context);
             asio::connect(socket, endpoints);
