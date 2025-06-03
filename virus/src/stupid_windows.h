@@ -1,105 +1,149 @@
-#pragma once
+#include <random>
+#define _WIN32_WINNT 0x0601
 #include <windows.h>
-#include <string>
-#include <iostream>
+#include <mmdeviceapi.h>
+#include <endpointvolume.h>
+#include <sapi.h>
+#include <winnt.h>
 
-// ──────────────────────────────────────────────────────────────────────────────
-//  tiny helper – press / release one UTF‑16 code unit via SendInput
-// ──────────────────────────────────────────────────────────────────────────────
-static void send_utf16_cu(char16_t cu, bool key_up = false)
-{
-    INPUT in{};
-    in.type            = INPUT_KEYBOARD;
-    in.ki.dwFlags      = KEYEVENTF_UNICODE | (key_up ? KEYEVENTF_KEYUP : 0);
-    in.ki.wScan        = static_cast<WORD>(cu);   // UTF‑16 code unit
-    in.ki.wVk          = 0;                       // must be 0 with KEYEVENTF_UNICODE
-    SendInput(1, &in, sizeof(INPUT));
+int random_in_range(int min, int max) {
+static std::random_device rd;  // Seed
+    static std::mt19937 gen(rd()); // Mersenne Twister RNG
+    std::uniform_int_distribution<> distrib(min, max);
+    return distrib(gen);
 }
 
-// ──────────────────────────────────────────────────────────────────────────────
-//  kick a whole UTF‑16 string out to the active window
-// ──────────────────────────────────────────────────────────────────────────────
-void type_string(const std::u16string& text, unsigned perKeyDelayMs = 10)
+void show_popup(const char* message) {
+    MessageBoxA(NULL, message, "Popup", MB_OK | MB_ICONINFORMATION);
+}
+
+void lockMouseToBox(int x, int y, int width, int height) {
+    RECT rect;
+    rect.left = x;
+    rect.top = y;
+    rect.right = x + width;
+    rect.bottom = y + height;
+
+    ClipCursor(&rect);
+}
+
+void free_locked_mouse() {
+    ClipCursor(nullptr);
+}
+bool captureScreenRGBA(unsigned char*& outPixels,
+                       int& width,
+                       int& height,
+                       int& channels /* =4 */)
 {
-    for (char16_t cu : text)
+    HDC hScreenDC = GetDC(nullptr);                // whole desktop
+    HDC hMemDC    = CreateCompatibleDC(hScreenDC);
+
+    width  = GetSystemMetrics(SM_CXSCREEN);
+    height = GetSystemMetrics(SM_CYSCREEN);
+    channels = 4;                                  // we force RGBA8
+
+    // Create a 32‑bit DIB section we can directly copy out of.
+    BITMAPINFO bmi { };
+    bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth       = width;
+    bmi.bmiHeader.biHeight      = -height;         // negative = top‑down
+    bmi.bmiHeader.biPlanes      = 1;
+    bmi.bmiHeader.biBitCount    = 32;              // BGRA, 8 bits each
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    void* dibPixels = nullptr;
+    HBITMAP hDib    = CreateDIBSection(
+        hScreenDC, &bmi, DIB_RGB_COLORS, &dibPixels, nullptr, 0);
+
+    HGDIOBJ oldBmp = SelectObject(hMemDC, hDib);
+
+    // Copy the screen into our DIB.
+    BitBlt(hMemDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
+
+    // Allocate final buffer in the same format stb delivers (RGBA).
+    size_t byteCount = static_cast<size_t>(width) * height * channels;
+    outPixels = static_cast<unsigned char*>(malloc(byteCount));
+
+    // Convert BGRA → RGBA in‑place while copying.
+    uint8_t* src = static_cast<uint8_t*>(dibPixels);
+    uint8_t* dst = outPixels;
+    for (size_t i = 0; i < width * height; ++i)
     {
-        send_utf16_cu(cu);              // key‑down
-        send_utf16_cu(cu, true);        // key‑up
-        if (perKeyDelayMs) Sleep(perKeyDelayMs);
+        dst[0] = src[2];   // R
+        dst[1] = src[1];   // G
+        dst[2] = src[0];   // B
+        dst[3] = src[3];   // A (always 255 from desktop)
+        src += 4; dst += 4;
     }
+
+    // Cleanup
+    SelectObject(hMemDC, oldBmp);
+    DeleteObject(hDib);
+    DeleteDC(hMemDC);
+    ReleaseDC(nullptr, hScreenDC);
+
+    return true;
 }
-
-// ──────────────────────────────────────────────────────────────────────────────
-//  convenience wrapper: UTF‑8 → UTF‑16 and call the version above
-// ──────────────────────────────────────────────────────────────────────────────
-void type_string(const std::string& utf8, unsigned perKeyDelayMs = 10)
+bool RotatePrimaryMonitor(DWORD angleDeg)
 {
-    if (utf8.empty()) return;
-
-    int n = MultiByteToWideChar(CP_UTF8, 0,
-                                utf8.data(), static_cast<int>(utf8.size()),
-                                nullptr, 0);
-    if (n <= 0) return;
-
-    std::u16string u16(static_cast<size_t>(n), u'\0');
-    MultiByteToWideChar(CP_UTF8, 0,
-                        utf8.data(), static_cast<int>(utf8.size()),
-                        reinterpret_cast<LPWSTR>(u16.data()), n);
-
-    type_string(u16, perKeyDelayMs);
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-//  packet handler: just forwards packet.str to our type_string()
-// ──────────────────────────────────────────────────────────────────────────────
-
-// ──────────────────────────────────────────────────────────────────────────────
-//  low‑level keyboard hook (diagnostic only)
-// ──────────────────────────────────────────────────────────────────────────────
-HHOOK g_hook = nullptr;
-
-LRESULT CALLBACK keyboard_hook(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    if (nCode == HC_ACTION)
+    DWORD orientation;
+    switch (angleDeg)
     {
-        const auto* p = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
-        switch (wParam)
-        {
-        case WM_KEYDOWN:
-        case WM_SYSKEYDOWN:
-            std::cout << "↓  " << p->vkCode << '\n';
-            break;
-        case WM_KEYUP:
-        case WM_SYSKEYUP:
-            std::cout << "↑  " << p->vkCode << '\n';
-            break;
-        }
+        case   0: orientation = DMDO_DEFAULT; break;
+        case  90: orientation = DMDO_90;     break;
+        case 180: orientation = DMDO_180;    break;
+        case 270: orientation = DMDO_270;    break;
+        default:  return false;
     }
-    return CallNextHookEx(g_hook, nCode, wParam, lParam);
-}
 
-// ──────────────────────────────────────────────────────────────────────────────
-//  translate a WM_KEYDOWN message to its printable UTF‑16 sequence (0–4 bytes)
-// ──────────────────────────────────────────────────────────────────────────────
-bool msgToUtf16(const MSG& m, std::u16string& out)
-{
-    if (m.message != WM_KEYDOWN && m.message != WM_SYSKEYDOWN)
+    DISPLAY_DEVICE dd{ sizeof(dd) };
+    if (!EnumDisplayDevices(nullptr, 0, &dd, 0))
         return false;
 
-    const auto* info = reinterpret_cast<KBDLLHOOKSTRUCT*>(m.lParam);
-    BYTE  kbState[256]{};
-    if (!GetKeyboardState(kbState)) return false;
+    DEVMODE dm{ };
+    dm.dmSize = sizeof(dm);
+    if (!EnumDisplaySettingsEx(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0))
+        return false;
 
-    WCHAR buf[4]{};                 // room for surrogate pair + NUL
-    int n = ToUnicodeEx(static_cast<UINT>(info->vkCode),
-                        static_cast<UINT>(info->scanCode),
-                        kbState,
-                        buf, 4, 0,
-                        GetKeyboardLayout(0));
+    bool nowPortrait  = (orientation == DMDO_90  || orientation == DMDO_270);
+    bool wasPortrait  = (dm.dmDisplayOrientation == DMDO_90 ||
+                         dm.dmDisplayOrientation == DMDO_270);
+    if (nowPortrait != wasPortrait)
+        std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
 
-    if (n <= 0) return false;       // dead key or non‑printing
+    dm.dmDisplayOrientation = orientation;
+    dm.dmFields = DM_DISPLAYORIENTATION | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-    out.assign(reinterpret_cast<char16_t*>(buf),
-               reinterpret_cast<char16_t*>(buf + n));
-    return true;
+    LONG res = ChangeDisplaySettingsEx(dd.DeviceName, &dm, nullptr,
+                                       CDS_UPDATEREGISTRY | CDS_GLOBAL, nullptr);
+    return (res == DISP_CHANGE_SUCCESSFUL);
+}
+
+bool SetMasterVolume(float level /*0.0 ‑ 1.0*/)
+{
+    HRESULT hr;
+    CoInitialize(nullptr);                             // 1. COM init
+
+    IMMDeviceEnumerator* pEnum = nullptr;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr,
+                          CLSCTX_INPROC_SERVER,
+                          IID_PPV_ARGS(&pEnum));
+    if (FAILED(hr)) return false;
+
+    IMMDevice* pDevice = nullptr;                      // 2. default render device
+    hr = pEnum->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
+    pEnum->Release();
+    if (FAILED(hr)) return false;
+
+    IAudioEndpointVolume* pVolume = nullptr;           // 3. volume interface
+    hr = pDevice->Activate(__uuidof(IAudioEndpointVolume),
+                           CLSCTX_INPROC_SERVER, nullptr,
+                           (void**)&pVolume);
+    pDevice->Release();
+    if (FAILED(hr)) return false;
+
+    hr = pVolume->SetMasterVolumeLevelScalar(level, nullptr); // 4. set
+    pVolume->Release();
+    CoUninitialize();
+    return SUCCEEDED(hr);
 }
