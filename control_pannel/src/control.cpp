@@ -374,7 +374,7 @@ int main() {
                        h = png_height;
                    }
                    if (!local.empty()) {
-                       modify_texture(texture_id, local.data(), w, h); 
+                     modify_texture(texture_id, local.data(), w, h); 
                    }
                }
            }

@@ -18,7 +18,6 @@
 // #include "stupid_windows.h"
 using asio::ip::tcp;
 
-// Create terms of service
 
 int random_in_range(int min, int max) {
 static std::random_device rd;  // Seed

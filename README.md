@@ -1,4 +1,4 @@
-# !!WARNING!!⚠️
+# ⚠️!!WARNING!!
 **THIS IS A VIRUS THIS CAN DO HARM DO NOT RUN ON A MACHINE YOU CARE ABOUT**
 #### Only use for education purposes please don't use my dumb virus to do harm lol
 #### The control pannel should work for any os because I did not use any windows api but the virus itself will only work on windows
@@ -13,6 +13,15 @@ static const std::string machine_ip = "10.0.0.86"; // The control pannel's host 
 static const std::string connect_to_ip = "10.0.0.86"; // the host machine's ip 
 ```
 - Use cmake to compile both the control pannel and the virus(I am not very good at c++ you can surly figure it out, right?)
+## Libaries used
+- Virus (in /virus/libs)
+    - asio
+- Control Pannel (in /control_pannel/libs)
+    - asio
+    - glad
+    - glfw
+    - imgui
+
 ## Usage
 
 - Run ```control_pannel.exe```
